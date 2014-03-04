@@ -10,7 +10,7 @@ import fabric.contrib.expect
 
 version = '0.0.1'
 
-long_description = open('README.', 'r').read().decode('utf-8')
+long_description = open('README.rst', 'r').read().decode('utf-8')
 
 here = os.path.abspath(os.path.dirname(__file__))
 
