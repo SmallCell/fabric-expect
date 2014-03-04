@@ -1,0 +1,42 @@
+
+#+TITLE: Expect inplace replacement
+#+CATEGORY: fabric
+
+* Perl original
+  #+BEGIN_SRC perl
+$spawn=Expect->spawn("ssh $username\@$host");
+# log everything if you want
+# $spawn->log_file("/tmp/autossh.log.$$");
+
+my $PROMPT  = '[\]\$\>\#]\s$';
+my $ret = $spawn->expect(10,
+	[ qr/\(yes\/no\)\?\s*$/ => sub { $spawn->send("yes\n"); exp_continue; } ],
+	[ qr/assword:\s*$/ 	=> sub { $spawn->send("$password\n") if defined $password;  } ],
+	[ qr/ogin:\s*$/		=> sub { $spawn->send("$username\n"); exp_continue; } ],
+	[ qr/REMOTE HOST IDEN/ 	=> sub { print "FIX: .ssh/known_hosts\n"; exp_continue; } ],
+	[ qr/$PROMPT/ 		=> sub { $spawn->send("echo Now try window resizing\n"); } ],
+);
+
+# Hand over control
+$spawn->interact();
+exit;
+  
+  #+END_SRC
+
+
+* org-config                                                        :ARCHIVE:
+#+STARTUP: content hidestars logdone
+#+TAGS: DOCS(d) CODING(c) TESTING(t) PLANING(p)
+#+LINK_UP: sitemap.html
+#+LINK_HOME: main.html
+#+COMMENT: toc:nil
+#+OPTIONS: ^:nil
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:nil -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+DESCRIPTION: Augment design process with system property discovering aid.
+#+KEYWORDS: SmallCell,
+#+LANGUAGE: en
+#+PROPERTY: Effort_ALL  1:00 2:00 4:00 6:00 8:00 12:00
+#+COLUMNS: %38ITEM(Details) %TAGS(Context) %7TODO(To Do) %5Effort(Time){:} %6CLOCKSUM{Total}
+
+#+STYLE: <link rel="stylesheet" type="text/css" href="org-manual.css" />
