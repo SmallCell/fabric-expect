@@ -1,5 +1,5 @@
 *.pyc
-*.py~
+*~
 .DS_Store
 # Tox support.  See: http://pypi.python.org/pypi/tox
 .tox

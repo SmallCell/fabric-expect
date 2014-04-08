@@ -10,7 +10,6 @@ import fabric.contrib.expect
 
 version = '0.0.1'
 
-long_description = open('README.rst', 'r').read().decode('utf-8')
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -22,6 +21,8 @@ def read(*filenames, **kwargs):
         with io.open(filename, encoding=encoding) as f:
             buf.append(f.read())
     return sep.join(buf)
+
+long_description = read('README.rst')
 
 class PyTest(TestCommand):
     def finalize_options(self):
@@ -64,7 +65,7 @@ setup(
     url='https://github.com/SmallCell/fabric-expect',
     license='BSD',
     cmdclass={'test': PyTest},
-    test_suite='fabric.contrib.expect.test.test_expect',
+    test_suite='test.test_expect',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
     namespace_packages=['fabric','fabric.contrib'],
     include_package_data=True,

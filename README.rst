@@ -17,6 +17,9 @@ or
 
     pip install fabric-expect
 
+    tox
+    
+    
 Usage
 =====
 
@@ -25,7 +28,25 @@ Usage
 
 ::
 
-    $ fab execute_naked_procedure:your_procedure.dsl
+     with open_interact_channel('sh') as chan:
+         chan.expect(
+             { 'timeout' : lambda: send_user("\nFailed to get password prompt\n") and exit(1),
+               'eof'     : lambda send_user "\nSSH failure for $hostname\n" and exit 1,
+               "*assword" : None
+           })
+     
+         chan.send "$password\r"
+     
+         chan.expect({
+             'timeout' : lambda: send_user "\nLogin failed. Password incorrect.\n" and  exit 1,
+             "*\> " : None
+         }
+     
+     )
+
+    chan.interact()
+
+
 
 Changelog
 =========
