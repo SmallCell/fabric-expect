@@ -8,7 +8,7 @@ import unittest
 # from fabric.io import output_loop
 # from fabric.thread_handling import ThreadHandler
 from fabric.state import default_channel
-from fabric.api import run, env, hosts
+from fabric.api import run, env
 from  fabric.contrib.expect import spawn, EOF, TIMEOUT
 
 from fabric.api import execute
@@ -36,6 +36,18 @@ class TestChannel(unittest.TestCase):
         # self.sockc.close()
         # self.socks.close()
         pass
+
+
+    @execute_wrap
+    def _test_channel(self):
+        chan = spawn(default_channel(), '/bin/sh') 
+        chan.send('ls')
+        fd = chan.channel.makefile()
+        res = fd.readline() 
+        while len(res):
+            print ">>" + res
+            print ">>" + str(len(res))
+            res = fd.readline()
          
     @execute_wrap
     def _test_hello_world(self):        
@@ -45,13 +57,24 @@ class TestChannel(unittest.TestCase):
     def test_expect(self):
 #        chan = spawn(self.socks)
         run("echo 'BEGIN'")
-        chan = spawn(default_channel(), 'ls')
-        chan.expect(500,  {
-            EOF : lambda: self.assertEqual(False),
-            TIMEOUT : lambda: self.assertEqual(True),
-            "*assword" : None
+        chan = spawn(default_channel())
+        chan.expect(5,  {
+            EOF : lambda: chan.close(),
+            TIMEOUT : lambda: self.assertEqual(False, "TIMEOUT"),
+            'Last' : None
         })
 
+        chan.send('uname -a\n')
+        
+        chan.expect(1,  {
+            EOF : lambda: chan.close(),
+            TIMEOUT : lambda: self.assertEqual(False, "TIMEOUT1"),
+            'Linux' : None,
+        })
+
+
+#        chan.interact()
+        
         chan.close()
 
         
