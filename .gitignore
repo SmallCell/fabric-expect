@@ -12,6 +12,11 @@
 # TextMate project file
 *.tmproj
 # Distribution-related folders and files.
+bin
+lib
+include
+local
+
 build
 dist
 MANIFEST
