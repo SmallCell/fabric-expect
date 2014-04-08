@@ -30,6 +30,9 @@ class spawn (object):
         self.stderr = stderr or sys.stderr
         self.timeout = env.command_timeout if (timeout is None) else timeout
 
+        self.last_line = None
+        self.last_match = None
+        
         self.channel.set_combine_stderr(True)
 
         rows, cols = _pty_size()
@@ -43,7 +46,6 @@ class spawn (object):
         # switch to file IO
         self.fd = self.channel.makefile('rwb')
 
-
     def expect(self, timeout, pattern):
         """
         Read lines from input channel and match them against patterns.
@@ -54,6 +56,7 @@ class spawn (object):
         default_timeout = self.channel.gettimeout()
         self.channel.settimeout(timeout)
         matchers = filter(lambda e: not e in [EOF, TIMEOUT], pattern)
+        self.last_match = None
         
         while(True):
             try:
@@ -84,17 +87,19 @@ class spawn (object):
         for m in expressions:
             res = re.match(m, txt)
             if res:
-                return m
+                self.last_match = m
+                return self.last_match
         return None
         
     def readline(self):
         try:
-            line = self.fd.readline()
-            if len(line) == 0:
-                raise EOF()
-            return line
+            self.last_line = self.fd.readline()
+            if self.fd.closed or len(self.last_line) == 0:
+                raise EOF()                
         except socket.timeout:
             raise TIMEOUT()
+            
+        return self.last_line
 
     def send(self, message):
         self.fd.write(message)
